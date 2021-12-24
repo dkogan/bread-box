@@ -16,6 +16,20 @@
 #define CMD_FIRMWARE             0x84,0xB8
 
 
+// Realtime plot with
+//
+// feedgnuplot                   \
+//   --domain                    \
+//   --vnl                       \
+//   --autolegend                \
+//   --stream                    \
+//   --lines                     \
+//   --points                    \
+//   --timefmt '%s'              \
+//   --set 'format x "%H:%M:%S"' \
+//   --y2 humidity
+
+
 static
 int64_t gettimeofday_int64(void)
 {
