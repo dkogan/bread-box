@@ -30,12 +30,13 @@
 //   --y2 humidity
 
 
+// Returns the time since the epoch, in us
 static
-int64_t gettimeofday_int64(void)
+int64_t gettimeofday_int64()
 {
     struct timeval tv;
     gettimeofday(&tv, NULL);
-    return (int64_t)tv.tv_sec;
+    return (int64_t) tv.tv_sec * 1000000LL + (int64_t) tv.tv_usec;
 }
 
 #define TRY(what, error) \
@@ -61,7 +62,9 @@ int main(void)
         "Read Nbytes != 1");
     printf("## Firmware byte: 0x%02x\n", data[0]);
 
-
+    // 10s
+    const int64_t framerate_us = 10000000;
+    int64_t t = gettimeofday_int64();
     while(1)
     {
         TRY(1 == write(fd, (char[]){CMD_MEASURE_HUMIDITY}, 1),
@@ -80,8 +83,14 @@ int main(void)
             ((double)(data[0])*256. + (double)(data[1])) * 175.72/65536. - 46.85;
 
         printf("%" PRId64 " %.1f %.1f\n",
-               gettimeofday_int64(), temperature, humidity);
+               t / 1000000,
+               temperature, humidity);
         fflush(stdout);
+
+        t += framerate_us;
+        int64_t t_sleep_us = t - gettimeofday_int64();
+        if(sleep_us > 0)
+            usleep(sleep_us);
     }
 
     return 0;
